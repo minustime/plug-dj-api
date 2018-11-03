@@ -6,15 +6,9 @@ import Joi from 'joi';
 import plugApiMethods from './plug-api-methods';
 import plugApiEvents from './plug-api-events';
 
-import { IPuppeteerOptions, IConnectOptions, IPlugAPI } from './index.types';
+import { IPuppeteerOptions, IConnectOptions, IWindow } from './index.types';
 
-declare global {
-  interface Window {
-    _csrf: string;
-    __sendout: (key: string, data: any) => void;
-    API: IPlugAPI;
-  }
-}
+declare const window: IWindow;
 
 class PlugDjApi extends EventEmitter {
   private readonly PLUG_URL: string = 'https://plug.dj';
@@ -22,7 +16,7 @@ class PlugDjApi extends EventEmitter {
   private puppeteerOptions: IPuppeteerOptions;
   private page: any;
 
-  constructor(puppeteerOptions: IPuppeteerOptions = {}) {
+  private constructor(puppeteerOptions: IPuppeteerOptions = {}) {
     super();
     this.puppeteerOptions = Object.assign({ headless: true, ...puppeteerOptions });
     this.mirrorPlugApiMethods();
@@ -31,16 +25,15 @@ class PlugDjApi extends EventEmitter {
   /**
    * Logs in to Plug and brings up specified room
    */
-  async connect(options: IConnectOptions) {
-    // Connect options validaion
+  public async connect(options: IConnectOptions) {
     const optionsSchema = {
-      username: Joi.string()
-        .min(1)
-        .required(),
       password: Joi.string()
         .min(1)
         .required(),
       roomId: Joi.string()
+        .min(1)
+        .required(),
+      username: Joi.string()
         .min(1)
         .required(),
     };
@@ -64,7 +57,7 @@ class PlugDjApi extends EventEmitter {
   /**
    * Logs in to Plug.dj
    */
-  async login(username: string, password: string) {
+  private async login(username: string, password: string) {
     await this.page.goto(this.PLUG_URL, { waitUntil: 'load' });
     await this.page.evaluate(
       (loginUrl: string, username: string, password: string) => {
@@ -87,7 +80,7 @@ class PlugDjApi extends EventEmitter {
                 JSON.stringify({
                   csrf: window._csrf,
                   email: username,
-                  password: password,
+                  password,
                 })
               );
               clearInterval(interval);
@@ -104,7 +97,7 @@ class PlugDjApi extends EventEmitter {
   /**
    * Navigate to the Plug.dj room
    */
-  async visitRoom(roomId: string) {
+  private async visitRoom(roomId: string) {
     await this.page.goto(`https://plug.dj/${roomId}`, { waitUntil: 'load' });
     await this.page.exposeFunction('__sendout', (eventType: string, data: any) =>
       this.emit(eventType, data)
@@ -116,7 +109,7 @@ class PlugDjApi extends EventEmitter {
             clearInterval(interval);
 
             // Register event handlers
-            for (let [key, value] of plugApiEventNames) {
+            for (const [key, value] of plugApiEventNames) {
               window.API.on(value, data => window.__sendout(key, data));
             }
 
@@ -130,7 +123,7 @@ class PlugDjApi extends EventEmitter {
   /**
    * Executes a Plug API method in the context of the Plug room
    */
-  async runPlugApiMethod(method: string, args: any) {
+  private async runPlugApiMethod(method: string, args: any) {
     return await this.page.evaluate(
       (method: string, args: any) => window.API[method].apply(this, args),
       method,
@@ -141,9 +134,11 @@ class PlugDjApi extends EventEmitter {
   /**
    * Creates methods within this class to mirror the plug API ones
    */
-  mirrorPlugApiMethods() {
-    for (let method of plugApiMethods) {
-      (this as any)[method] = (...args: any) => this.runPlugApiMethod(method, args);
+  private mirrorPlugApiMethods() {
+    for (const method of plugApiMethods) {
+      if (!this.hasOwnProperty(method)) {
+        (this as any)[method] = (...args: any) => this.runPlugApiMethod(method, args);
+      }
     }
   }
 }
