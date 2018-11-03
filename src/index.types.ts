@@ -1,6 +1,6 @@
 export interface IPuppeteerOptions {}
 
-export interface IOptions {
+export interface IConnectOptions {
   username: string;
   password: string;
   roomId: string;

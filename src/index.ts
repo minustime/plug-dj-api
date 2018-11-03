@@ -3,8 +3,10 @@
 import EventEmitter from 'events';
 import puppeteer from 'puppeteer';
 import Joi from 'joi';
+import plugApiMethods from './plug-api-methods';
+import plugApiEvents from './plug-api-events';
 
-import { IPuppeteerOptions, IOptions, IPlugAPI } from './index.types';
+import { IPuppeteerOptions, IConnectOptions, IPlugAPI } from './index.types';
 
 declare global {
   interface Window {
@@ -15,120 +17,52 @@ declare global {
 }
 
 class PlugDjApi extends EventEmitter {
-  private PLUG_URL: string;
-  private PLUG_LOGIN_URL: string;
-  private PLUG_API_EVENTS: any;
-  private PLUG_API_METHODS: string[];
-
+  private readonly PLUG_URL: string = 'https://plug.dj';
+  private readonly PLUG_LOGIN_URL: string = 'https://plug.dj/_/auth/login';
   private puppeteerOptions: IPuppeteerOptions;
   private page: any;
 
   constructor(puppeteerOptions: IPuppeteerOptions = {}) {
     super();
-    this.PLUG_URL = 'https://plug.dj';
-    this.PLUG_LOGIN_URL = 'https://plug.dj/_/auth/login';
-    this.PLUG_API_EVENTS = [
-      ['ADVANCE', 'advance'],
-      // ['BAN', ''],
-      ['CHAT', 'chat'],
-      ['CHAT_COMMAND', 'chatCommand'],
-      ['FRIEND_JOIN', 'friendJoin'],
-      ['GRAB_UPDATE', 'grabUpdate'],
-      ['HISTORY_UPDATE', 'historyUpdate'],
-      ['MOD_SKIP', 'modSkip'],
-      // ['MUTE', ''],
-      // ['ROLE', ''],
-      ['SCORE_UPDATE', 'scoreUpdate'],
-      ['USER_JOIN', 'userJoin'],
-      ['USER_LEAVE', 'userLeave'],
-      ['USER_SKIP', 'userSkip'],
-      ['VOTE_UPDATED', 'voteUpdate'],
-      ['WAIT_LIST_UPDATE', 'waitListUpdate'],
-    ];
-    this.PLUG_API_METHODS = [
-      'chatLog',
-      'djJoin',
-      'djLeave',
-      'getAdmins',
-      'getAmbassadors',
-      'getAudience',
-      'getBannedUsers',
-      'getDJ',
-      'getHistory',
-      'getHost',
-      'getMedia',
-      'getNextMedia',
-      'getScore',
-      'getStaff',
-      'getTimeElapsed',
-      'getTimeRemaining',
-      'getUser',
-      'getUsers',
-      'getVolume',
-      'getWaitList',
-      'getWaitListPosition',
-      'hasPermission',
-      'moderateAddDJ',
-      'moderateBanUser',
-      'moderateDJCycle',
-      'moderateDeleteChat',
-      'moderateForceSkip',
-      'moderateLockWaitList',
-      'moderateMinChatLevel',
-      'moderateMoveDJ',
-      'moderateMuteUser',
-      'moderateRemoveDJ',
-      'moderateSetRole',
-      'moderateUnbanUser',
-      'moderateUnmuteUser',
-      'sendChat',
-      'setVolume',
-    ];
-    this.puppeteerOptions = puppeteerOptions;
+    this.puppeteerOptions = Object.assign({ headless: true, ...puppeteerOptions });
     this.mirrorPlugApiMethods();
   }
 
   /**
    * Logs in to Plug and brings up specified room
-   * @param {object} options - Plug.dj connection options
    */
-  connect(options: IOptions) {
-    return new Promise(async (resolve, reject) => {
-      // Connect options validaion
-      const optionsSchema = {
-        username: Joi.string()
-          .min(1)
-          .required(),
-        password: Joi.string()
-          .min(1)
-          .required(),
-        roomId: Joi.string()
-          .min(1)
-          .required(),
-      };
+  async connect(options: IConnectOptions) {
+    // Connect options validaion
+    const optionsSchema = {
+      username: Joi.string()
+        .min(1)
+        .required(),
+      password: Joi.string()
+        .min(1)
+        .required(),
+      roomId: Joi.string()
+        .min(1)
+        .required(),
+    };
 
-      const validation = Joi.validate(options, optionsSchema);
+    const validation = Joi.validate(options, optionsSchema);
 
-      if (validation.error) {
-        reject(validation.error.details.map(i => i.message).join(''));
-      } else {
-        const browser = await puppeteer.launch(this.puppeteerOptions);
-        this.page = await browser.newPage();
-        try {
-          await this.login(options.username, options.password);
-          await this.visitRoom(options.roomId);
-          resolve();
-        } catch (err) {
-          reject('Could not login or visit room, check credentials and/or room name');
-        }
+    if (validation.error) {
+      throw new Error(validation.error.details.map(i => i.message).join(''));
+    } else {
+      const browser = await puppeteer.launch(this.puppeteerOptions);
+      this.page = await browser.newPage();
+      try {
+        await this.login(options.username, options.password);
+        await this.visitRoom(options.roomId);
+      } catch (err) {
+        throw new Error('Could not login or visit room, check credentials and/or room name');
       }
-    });
+    }
   }
 
   /**
    * Logs in to Plug.dj
-   * @param {string} username - Plug.dj username
-   * @param {string} password - Plug.dj password
    */
   async login(username: string, password: string) {
     await this.page.goto(this.PLUG_URL, { waitUntil: 'load' });
@@ -169,7 +103,6 @@ class PlugDjApi extends EventEmitter {
 
   /**
    * Navigate to the Plug.dj room
-   * @param {string} roomId - Id of the Plug.dj room
    */
   async visitRoom(roomId: string) {
     await this.page.goto(`https://plug.dj/${roomId}`, { waitUntil: 'load' });
@@ -184,20 +117,18 @@ class PlugDjApi extends EventEmitter {
 
             // Register event handlers
             for (let [key, value] of plugApiEventNames) {
-              window.API.on(value, async data => window.__sendout(key, data));
+              window.API.on(value, data => window.__sendout(key, data));
             }
 
             resolve();
           }
         }, 500);
       });
-    }, this.PLUG_API_EVENTS);
+    }, plugApiEvents);
   }
 
   /**
    * Executes a Plug API method in the context of the Plug room
-   * @param {string} method - Plug.dj API method to execute
-   * @param {array} args - Arguments passed to the Plug.dj API method
    */
   async runPlugApiMethod(method: string, args: any) {
     return await this.page.evaluate(
@@ -211,7 +142,7 @@ class PlugDjApi extends EventEmitter {
    * Creates methods within this class to mirror the plug API ones
    */
   mirrorPlugApiMethods() {
-    for (let method of this.PLUG_API_METHODS) {
+    for (let method of plugApiMethods) {
       (this as any)[method] = (...args: any) => this.runPlugApiMethod(method, args);
     }
   }
