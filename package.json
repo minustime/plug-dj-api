@@ -1,0 +1,29 @@
+{
+  "name": "plug-dj-api",
+  "version": "0.1.0",
+  "description": "Generic plug.dj api to create bots",
+  "main": "dist/index.js",
+  "scripts": {
+    "watch": "tsc -w",
+    "build": "tsc"
+  },
+  "keywords": [
+    "plug.dj",
+    "api"
+  ],
+  "types": "dist/index.d.ts",
+  "author": "Vic <vic@minustime.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/joi": "^14.0.0",
+    "@types/node": "^10.12.2",
+    "@types/puppeteer": "^1.9.1",
+    "prettier": "^1.14.3",
+    "tslint": "^5.11.0",
+    "typescript": "^3.1.6"
+  },
+  "dependencies": {
+    "joi": "^14.0.4",
+    "puppeteer": "^1.10.0"
+  }
+}
