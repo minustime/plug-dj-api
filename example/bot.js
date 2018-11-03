@@ -17,7 +17,7 @@ const plugApi = new PlugApi();
 
     // Handle song ADVANCE
     plugApi.on('ADVANCE', data => {
-      plugApi.sendChat('hi!!!');
+      plugApi.sendChat('Song transitioned!');
     });
   } catch (err) {
     console.log(`Error setting up api: ${err}`);
