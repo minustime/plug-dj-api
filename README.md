@@ -1,6 +1,6 @@
 # Plug.dj API
 
-A generic library to create plug.dj bots
+A generic library to create plug.dj bots.
 
 ## Usage
 
@@ -30,7 +30,7 @@ const options = {
 
     // Handle song ADVANCE
     plugApi.on('ADVANCE', data => {
-      console.log(data);
+      plugApi.sendChat('Song transitioned!');
     });
 
   } catch (err) {
@@ -41,7 +41,7 @@ const options = {
 
 ## Sample bot
 
-Follow these steps to the provided sample bot
+Follow these steps to run the provided sample bot:
 
 1. Install dependencies
 
@@ -58,6 +58,7 @@ $ npm run build
 3. Configure your bot credentials
 
 ```
+// Copy sample config and edit credentials within
 $ cp example/config.sample.json example/config.json
 ```
 
