@@ -4,9 +4,15 @@
   "description": "A generic library to create plug.dj bots",
   "main": "dist/index.js",
   "scripts": {
-    "watch": "tsc -w",
-    "build": "tsc",
+    "watch": "npm run build && tsc -w",
+    "build": "npm run clean && tsc",
+    "prepublish": "npm run build",
+    "clean": "rimraf dist",
     "lint": "tslint src/*.ts -t verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/minustime/plug-dj-api.git"
   },
   "keywords": [
     "plug.dj",
@@ -22,6 +28,7 @@
     "@types/node": "^10.12.2",
     "@types/puppeteer": "^1.9.1",
     "prettier": "^1.14.3",
+    "rimraf": "^2.6.2",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "typescript": "^3.1.6"
@@ -29,5 +36,8 @@
   "dependencies": {
     "joi": "^14.0.4",
     "puppeteer": "^1.10.0"
-  }
+  },
+  "files": [
+    "dist/"
+  ]
 }
