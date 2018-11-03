@@ -1,11 +1,11 @@
-# Plug API
+# Plug.dj API
 
-A generic library to create bots for plug.dj
+A generic library to create a plug.dj bot
 
 ## Usage
 
 ```
-const PlugApi = require('./dist');
+const PlugApi = require('plug-dj-api');
 
 const plugApi = new PlugApi();
 
@@ -37,4 +37,32 @@ const options = {
     console.log(`Error setting up api: ${err}`);
   }
 })();
+```
+
+## Sample bot
+
+Follow these steps to the provided sample bot
+
+1. Install dependencies
+
+```
+$ npm install
+```
+
+2. Build the project
+
+```
+$ npm run build
+```
+
+3. Configure your bot credentials
+
+```
+$ cp example/config.sample.json example/config.json
+```
+
+4. Run it
+
+```
+$ node example/bot.js
 ```

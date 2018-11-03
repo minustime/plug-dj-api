@@ -4,6 +4,29 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Watch",
+      "type": "npm",
+      "script": "build",
+      "problemMatcher": {
+        "base": "$tsc-watch",
+        "fileLocation": "relative"
+      }
+    },
+    {
+      "label": "Build",
+      "type": "typescript",
+      "tsconfig": "tsconfig.json",
+      "problemMatcher": {
+        "base": "$tsc",
+        "fileLocation": "relative"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Lint",
       "type": "npm",
       "script": "lint",
       "problemMatcher": {

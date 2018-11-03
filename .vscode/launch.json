@@ -5,13 +5,16 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "plug-dj-api",
+      "name": "sample bot",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceRoot}/dist/index.js",
+      "program": "${workspaceRoot}/example/bot.js",
+      "preLaunchTask": "Build",
+      "sourceMaps": true,
+      "runtimeArgs": ["--nolazy"],
+
       "cwd": "${workspaceRoot}",
-      "outFiles": ["${workspaceRoot}/dist/**/*.js"],
-      "sourceMaps": true
+      "protocol": "inspector"
     }
   ]
 }
