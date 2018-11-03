@@ -1,6 +1,6 @@
 # Plug.dj API
 
-A generic library to create a plug.dj bot
+A generic library to create plug.dj bots
 
 ## Usage
 
