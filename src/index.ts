@@ -13,6 +13,7 @@ declare const window: IWindow;
 class PlugDjApi extends EventEmitter {
   private readonly PLUG_URL: string = 'https://plug.dj';
   private readonly PLUG_LOGIN_URL: string = 'https://plug.dj/_/auth/login';
+  private readonly PLUG_ROOM_URL: string = 'https://plug.dj/{roomId}';
   private puppeteerOptions: IPuppeteerOptions;
   private page: any;
 
@@ -98,7 +99,7 @@ class PlugDjApi extends EventEmitter {
    * Navigate to the Plug.dj room
    */
   private async visitRoom(roomId: string) {
-    await this.page.goto(`https://plug.dj/${roomId}`, { waitUntil: 'load' });
+    await this.page.goto(this.PLUG_ROOM_URL.replace('{roomId}', roomId), { waitUntil: 'load' });
     await this.page.exposeFunction('__sendout', (eventType: string, data: any) =>
       this.emit(eventType, data)
     );
