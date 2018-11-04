@@ -17,7 +17,7 @@ class PlugDjApi extends EventEmitter {
   private puppeteerOptions: IPuppeteerOptions;
   private page: any;
 
-  private constructor(puppeteerOptions: IPuppeteerOptions = {}) {
+  public constructor(puppeteerOptions: IPuppeteerOptions = {}) {
     super();
     this.puppeteerOptions = Object.assign({ headless: true, ...puppeteerOptions });
     this.mirrorPlugApiMethods();
@@ -144,4 +144,5 @@ class PlugDjApi extends EventEmitter {
   }
 }
 
-module.exports = PlugDjApi;
+/* tslint:disable:no-string-literal */
+module.exports = exports['defaults'] = PlugDjApi
