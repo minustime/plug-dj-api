@@ -24,18 +24,18 @@
   "author": "Vic <vic@minustime.com>",
   "license": "ISC",
   "devDependencies": {
-    "@types/joi": "^14.0.0",
-    "@types/node": "^10.12.2",
-    "@types/puppeteer": "^1.9.1",
-    "prettier": "^1.14.3",
-    "rimraf": "^2.6.2",
-    "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.1.6"
+    "@types/joi": "14.3.3",
+    "@types/node": "12.12.3",
+    "@types/puppeteer": "1.20.2",
+    "prettier": "1.18.2",
+    "rimraf": "3.0.0",
+    "tslint": "5.20.0",
+    "tslint-config-prettier": "1.18.0",
+    "typescript": "3.6.4"
   },
   "dependencies": {
     "joi": "^14.0.4",
-    "puppeteer": "^1.10.0"
+    "puppeteer": "2.0.0"
   },
   "files": [
     "dist/"
