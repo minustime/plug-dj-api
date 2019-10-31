@@ -8,7 +8,9 @@
     "build": "npm run clean && tsc",
     "prepare": "npm run build",
     "clean": "rimraf dist",
-    "lint": "tslint src/*.ts -t verbose"
+    "lint": "tslint src/*.ts -t verbose",
+    "test": "jest",
+    "watch:test": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -24,12 +26,15 @@
   "author": "Vic <vic@minustime.com>",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^24.0.21",
     "@types/joi": "14.3.3",
     "@types/node": "12.12.3",
     "@types/puppeteer": "1.20.2",
+    "jest": "^24.9.0",
     "prettier": "1.18.2",
     "rimraf": "3.0.0",
     "tslint": "5.20.0",
+    "ts-jest": "24.1.0",
     "tslint-config-prettier": "1.18.0",
     "typescript": "3.6.4"
   },
